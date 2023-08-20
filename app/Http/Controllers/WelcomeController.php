@@ -2,28 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-
 class WelcomeController
 {
-    public function index(Request $req, Response $res, $args)
+    public function index($response)
     {
-        return view($res, 'index.twig');
+        return view($response, 'index.twig');
     }
 
-    public function test(Request $req, Response $res, $args)
+    public function test($response, $name)
     {
-        $name = $args['name'];
         $templateStr = '<p> Hi, Your name is {{ name }}.</p>';
-        return render_string($res, $templateStr, ['name' => $name]);
+        return render_string($response, $templateStr, ['name' => $name]);
     }
 
-    public function api(Request $req, Response $res, $args)
+    public function api($response, $name)
     {
-        $name = $args['name'];
         $data = ['name' => $name];
-        $res->getBody()->write(json($data));
-        return $res;
+        $response->getBody()->write(json($data));
+        return $response;
     }
 }
