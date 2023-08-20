@@ -18,9 +18,20 @@ function base_path($path = '')
     return  __DIR__ . "/../{$path}";
 }
 
-function flash()
+function abort($code = 404)
 {
-    echo 'flash';
+    http_response_code($code);
+
+    require base_path("views/{$code}.php");
+
+    die();
+}
+
+function throw_when(bool $fails, string $message, string $exception = Exception::class)
+{
+    if (!$fails) return;
+
+    throw new $exception($message);
 }
 
 // This is the default function that blade calls from the @csrf directive
@@ -28,10 +39,10 @@ function flash()
 function csrf_field()
 {
     $csrf = app()->getContainer()->get('csrf');
-    $csrfNameKey = $csrf->getTokenNameKey();
-    $csrfValueKey = $csrf->getTokenValueKey();
     $csrfName = $csrf->getTokenName();
     $csrfValue = $csrf->getTokenValue();
+    $csrfNameKey = $csrf->getTokenNameKey();
+    $csrfValueKey = $csrf->getTokenValueKey();
 
     $inputs = "
         <input type=\"hidden\" name=\"{$csrfNameKey}\" value=\"{$csrfName}\"/>

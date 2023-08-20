@@ -10,6 +10,7 @@ return function (App $app) {
     $app->get('/about', function ($response) {
         return view($response, 'about');
     });
+    $app->post('/test', [WelcomeController::class, 'test']);
     $app->get('/contact', function ($response) {
         return view($response, 'contact');
     });

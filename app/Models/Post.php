@@ -2,12 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Post extends Model
+class Post
 {
-    protected $fillable = [
-        'title',
-        'body'
-    ];
+    private $db;
+    public function __construct()
+    {
+        $this->db = app()->getContainer()->get('db');
+    }
+
+    public function findPost($id)
+    {
+        $post = $this->db->query('SELECT * FROM posts WHERE id = :id', [
+            'id' => $id
+        ])->find();
+
+        return $post;
+    }
+
+    public function getPosts()
+    {
+        $posts = $this->db->query('SELECT * FROM posts')->get();
+        return $posts;
+    }
 }
