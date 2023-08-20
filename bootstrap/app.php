@@ -12,24 +12,26 @@ $container = new Container();
 $app = SlimAppFactory::create($container);
 
 $_SERVER['app'] = &$app;
-if (!function_exists('app')) {
-    function app()
-    {
-        return $_SERVER['app'];
-    }
+function app()
+{
+    return $_SERVER['app'];
 }
 
 // Get container function and instantiate the container with services
-$appContainer = require __DIR__ . '/../app/services/appContainer.php';
-$appContainer($container);
+$dependencies = require __DIR__ . '/../app/services/dependencies.php';
+$dependencies($container);
+
 try {
-    $env = Dotenv::createImmutable(base_path());
+    $env = Dotenv::createImmutable(__DIR__ . '/../');
     $env->load();
 } catch (InvalidPathException $e) {
 }
+$container->get('db');
+
 // Set and instantiate global middlewares
 $middleware = require __DIR__ . '/../app/services/middleware.php';
 $middleware($app);
+
 
 // Application routes
 $routes = require __DIR__ . '/../routes.php';

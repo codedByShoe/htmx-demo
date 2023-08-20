@@ -3,16 +3,15 @@
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 use App\Http\Controllers\WelcomeController;
-use App\Http\Middleware\ExampleAfterMiddleware;
 
 return function (App $app) {
     $app->get('/', [WelcomeController::class, 'index']);
-    $app->get('/test/{name}', [WelcomeController::class, 'test'])->add(new ExampleAfterMiddleware);
+    $app->get('/posts', [WelcomeController::class, 'show']);
     $app->get('/about', function ($response) {
-        return view($response, 'about.twig');
+        return view($response, 'about');
     });
     $app->get('/contact', function ($response) {
-        return view($response, 'contact.twig');
+        return view($response, 'contact');
     });
     // api routes prefixed with /api
     $app->group('/api', function (RouteCollectorProxy $group) {

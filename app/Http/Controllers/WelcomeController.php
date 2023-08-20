@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+
 class WelcomeController
 {
     public function index($response)
     {
-        return view($response, 'index.twig');
+        return view($response, 'index');
     }
-
-    public function test($response, $name)
+    public function show($response, Post $post)
     {
-        $templateStr = '<p> Hi, Your name is {{ name }}.</p>';
-        return render_string($response, $templateStr, ['name' => $name]);
+        $posts = Post::get();
+        return view($response, 'partials.posts', compact('posts'));
     }
 
     public function api($response, $name)

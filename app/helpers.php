@@ -3,13 +3,8 @@
 // helper functions
 function view($response, $template, $data = [])
 {
-    return app()->getContainer()->get('view')->render($response, $template, $data);
-}
-
-function render_string($response, $string, $data = [])
-{
-    $str = app()->getContainer()->get('view')->fetchFromString($string, $data);
-    $response->getBody()->write($str);
+    $blade = app()->getContainer()->get('view');
+    $response->getBody()->write($blade->make($template, $data)->render());
     return $response;
 }
 
@@ -23,16 +18,24 @@ function base_path($path = '')
     return  __DIR__ . "/../{$path}";
 }
 
-function throw_when(bool $fails, string $message, string $exception = Exception::class)
+function flash()
 {
-    if (!$fails) return;
-
-    throw new $exception($message);
+    echo 'flash';
 }
 
-function env($key, $default = false)
+// This is the default function that blade calls from the @csrf directive
+// This is the easiest way to wire it into the slim/csrf package
+function csrf_field()
 {
-    $value = getenv($key);
-    throw_when(!$value and !$default, "{$key} is not a defined .env variable and has not default value");
-    return $value or $default;
+    $csrf = app()->getContainer()->get('csrf');
+    $csrfNameKey = $csrf->getTokenNameKey();
+    $csrfValueKey = $csrf->getTokenValueKey();
+    $csrfName = $csrf->getTokenName();
+    $csrfValue = $csrf->getTokenValue();
+
+    $inputs = "
+        <input type=\"hidden\" name=\"{$csrfNameKey}\" value=\"{$csrfName}\"/>
+        <input type=\"hidden\" name=\"{$csrfValueKey}\" value=\"{$csrfValue}\"/>
+        ";
+    return $inputs;
 }
