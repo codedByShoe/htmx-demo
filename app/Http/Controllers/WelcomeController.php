@@ -18,21 +18,34 @@ class WelcomeController extends Controller
         return $this->view($response, 'index');
     }
 
-    public function test($request)
+    public function test($response, $request)
     {
         $inputs = $request->getParsedBody();
         $validator = $this->validator($inputs)->validateFields();
 
-        if ($validator->isValid()) {
-            dumpe('validated');
-        } else {
-            dumpe($validator->errors());
+        if (!$validator->isValid()) {
+            $errors = $validator->errors();
+            $nameFieldError = $errors['name'][0];
+            $emailFieldError = $errors['email'][0];
+            return $this->view($response, 'partials.form-errors', [
+                'name' => $nameFieldError,
+                'email' => $emailFieldError
+            ]);
         }
+        return $response->withHeader('HX-Redirect', '/')->withStatus(200);
     }
 
-    public function show($response, Post $post)
+    public function show($response)
     {
         $posts = $this->postModel->getPosts();
+        return $this->view($response, 'partials.posts', compact('posts'));
+    }
+
+    public function search($response, $request)
+    {
+        $inputs = $request->getParsedBody();
+        $search = $inputs['search'];
+        $posts = $this->postModel->searchByAuthor($search);
         return $this->view($response, 'partials.posts', compact('posts'));
     }
 

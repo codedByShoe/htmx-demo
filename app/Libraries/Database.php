@@ -7,15 +7,32 @@ use PDO;
 class Database
 {
     public $connection;
+    public $config;
     public $statement;
 
-    public function __construct($config, $username = 'root', $password = '')
+    public function __construct($config)
     {
-        $dsn = 'mysql:' . http_build_query($config, '', ';');
-
-        $this->connection = new PDO($dsn, $username, $password, [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
-        ]);
+        $this->config = $config;
+        $dsn = $this->getDsn(mb_convert_case($config['connection'], MB_CASE_LOWER));
+        try {
+            $this->connection = new PDO($dsn, $config['dbuser'], $config['dbpass'], [
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
+            ]);
+        } catch (\Exception $e) {
+            dumpe($e->getMessage());
+        }
+    }
+    private function getDsn($dbType)
+    {
+        switch ($dbType) {
+            case 'mysql':
+                return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['dbname'];
+            case 'sqlite':
+                return 'sqlite:' . base_path($this->config['dburl']);
+                // Add more cases for other database types if needed
+            default:
+                throw new \Exception('Unsupported database type: ' . $dbType);
+        }
     }
 
     public function query($query, $params = [])
