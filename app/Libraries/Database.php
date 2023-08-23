@@ -24,15 +24,14 @@ class Database
     }
     private function getDsn($dbType)
     {
-        switch ($dbType) {
-            case 'mysql':
-                return 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['dbname'];
-            case 'sqlite':
-                return 'sqlite:' . base_path($this->config['dburl']);
-                // Add more cases for other database types if needed
-            default:
-                throw new \Exception('Unsupported database type: ' . $dbType);
-        }
+        $dsn = match($dbType) {
+          'mysql'  => 'mysql:host=' . $this->config['host'] . ';dbname=' . $this->config['dbname'],
+          'sqlite' => 'sqlite:' . base_path($this->config['dburl']),
+          default  => throw new \Exception('Unsupported database type: ' . $dbType)
+        };
+
+        return $dsn;
+
     }
 
     public function query($query, $params = [])
